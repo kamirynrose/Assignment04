@@ -1,0 +1,79 @@
+---
+title: "index"
+author: "Parker and Kamiryn"
+format: html
+editor: visual
+---
+
+Our data comes from here: <https://datacatalog.worldbank.org/search/dataset/0038480/Education-Statistics>
+
+## Enrollment Based on Income
+
+```{r}
+#| echo: false
+library (tidyverse)
+library(ggplot2)
+library(readxl)
+library(here)
+#| echo: false
+url <- "https://databank.worldbank.org/data/download/EdStats_CSV.zip"
+
+dir.create("data")
+
+download.file(
+  url, 
+  destfile = "data/EdStats_CSV.zip"
+)
+
+
+dest_path <- here("Assignment04/data", "EdStats_CSV.zip")
+
+if (!file.exists(dest_path)){
+  download.file(url, 
+                destfile = dest_path
+  )
+}
+
+
+unzip(
+  zipfile = here("Assignment04/data", 
+                 "EdStats_CSV.zip"), 
+  exdir = here("Assignment04/data")
+)
+
+ed_data <- read_csv(
+  here("Assignment04/data/", 
+       "EdStatsData.csv"
+       )
+)
+
+primary_ed_data_2000_income <- ed_data %>%
+  filter(`Indicator Code`== "SE.PRM.TENR.MA")%>%
+  select(`Country Name`,`2000`)
+
+  
+colnames(primary_ed_data_2000_income)[2] = "enrollment"
+
+colnames(primary_ed_data_2000_income)[1] = "country"
+
+primary_ed_data_2000_income <- primary_ed_data_2000_income %>%
+  filter(country == "High income" | country == "Middle income" | country =="Low income")
+
+primary_ed_data_2000_income %>%
+  ggplot(mapping = aes(x=reorder(country,enrollment), y=enrollment)) +
+  geom_col(color = "white", fill = "orange") +
+  theme_dark()+
+  labs(title = "Adjusted net enrolment rate (%) in primary school for men by country income level",
+       subtitle = "Year: 2000", caption = "Source: World Bank")+
+  xlab("Income Level") +
+  ylab("Enrollment %") 
+
+
+
+```
+
+This graph shows the relationship of income class of a country on male matriculation to primary school. This is especially important when looking for indicators of low enrollment in areas where direct enrollment rates may not be readily available. While we can not form any causal assumptions from this data alone, we can determine that extremely high rates of primary enrollment for men is correlated with a country being designated as high income whereas lower rates nearing 50% of enrollment is correlated with a low income designation. \
+
+```{r}
+
+```
