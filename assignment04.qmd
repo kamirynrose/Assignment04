@@ -146,4 +146,19 @@ This graph is Interesting because it shows a lack of relationship. That is, that
 
 ```{r}
 
+primary_ed_data_literacy <- ed_data %>%
+  filter(`Indicator Code`== "UIS.ILLPOPF.AG25T64")
+
+
+primary_ed_data_literacy %>%
+  group_by(`Country Code`) %>%
+  summarise(n= is.na(`Country Code`)) %>%
+  ggplot(
+    geom_bar(mapping = aes(x=n))
+  )
+
+
+
 ```
+
+This graph, had it worked properly would show in just one case the sheer number of indicators that are missing from the data. Overall, there is tons of missing data that we have to work with in Public policy and as such, we are not able to simply take data easily and run with it. We need to know whether things can be good indicators, especially as it related to income and literacy rates. How can we best attack the issue of illiteracy when we are unable to know even how bad the issue is? Using indicators is a great way to solve for this.
