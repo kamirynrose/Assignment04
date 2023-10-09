@@ -15,7 +15,6 @@ library (tidyverse)
 library(ggplot2)
 library(readxl)
 library(here)
-#| echo: false
 url <- "https://databank.worldbank.org/data/download/EdStats_CSV.zip"
 
 dir.create("data")
@@ -63,7 +62,8 @@ primary_ed_data_2000_income %>%
   ggplot(mapping = aes(x=reorder(country,enrollment), y=enrollment)) +
   geom_col(color = "white", fill = "orange") +
   theme_dark()+
-  labs(title = "Adjusted net enrolment rate (%) in primary school for men by country income level",
+  scale_y_reverse()+
+  labs(title = "Enrollment Rate (%) in Primary School for Men by Country Income Level",
        subtitle = "Year: 2000", caption = "Source: World Bank")+
   xlab("Income Level") +
   ylab("Enrollment %") 
@@ -74,6 +74,29 @@ primary_ed_data_2000_income %>%
 
 This graph shows the relationship of income class of a country on male matriculation to primary school. This is especially important when looking for indicators of low enrollment in areas where direct enrollment rates may not be readily available. While we can not form any causal assumptions from this data alone, we can determine that extremely high rates of primary enrollment for men is correlated with a country being designated as high income whereas lower rates nearing 50% of enrollment is correlated with a low income designation. \
 
-```{r}
+## Enrollment over time
 
+```{r}
+#| echo: false
+primary_ed_data_2000_female_enrollment <- ed_data %>%
+  filter(`Indicator Code`== "UIS.E.1.G2.F") %>%
+  filter(`Country Code` == "HPC") %>%
+  select(1, 34:44)
+
+library(reshape2)
+library(scales)
+primary_ed_data_2000_female_enrollment <- stack(primary_ed_data_2000_female_enrollment)
+
+primary_ed_data_2000_female_enrollment %>%
+  filter(ind != "Country Name") %>%
+  ggplot(mapping = aes(x=ind, y=values))+
+  geom_point(size = 2, shape = "square")+
+  geom_smooth()+
+  labs(title = "Female Enrollment in Grade 2 over time",
+       subtitle = "Years:1999-2009", caption = "Source: World Bank")+
+  xlab("Year") +
+  ylab("Enrollment number")+
+  theme_linedraw()
 ```
+
+This graph shows female enrollment over time in grade 2 (between 1999 and 2009). This is beneficial because not only do we see an upward trend, we can use this information to glean info about the general way that enrollment moves. We often see missing data in education data, especially the more recent the years are, however, this can help us estimate approximations of what current enrollment may look like if we know any past data point. We can do this by either running a regression or really just finding a line of best fit.
